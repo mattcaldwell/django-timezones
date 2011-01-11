@@ -1,8 +1,11 @@
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.utils.encoding import smart_str
-
+from django.utils.thread_support import currentThread
 import pytz
+
+#Dict to manage thread unique timezone
+_timezone = {}
 
 
 def localtime_for_timezone(value, timezone):
@@ -39,3 +42,27 @@ def validate_timezone_max_length(max_length, zones):
         return x and (len(y) <= max_length)
     if not reduce(reducer, zones, True):
         raise Exception("timezones.fields.TimeZoneField MAX_TIMEZONE_LENGTH is too small")
+
+
+def activate_timezone(timezone):
+        if isinstance(timezone, basestring):
+            timezone = smart_str(timezone)
+        if timezone in pytz.all_timezones_set:
+            timezone = pytz.timezone(timezone)
+            
+        _timezone[currentThread()] = timezone
+
+def deactivate_timezone():
+    global _active
+    if currentThread() in _timezone:
+        del _timezone[currentThread()]
+
+
+def get_timezone():
+    timezone = _timezone.get(currentThread(), None)
+
+    if timezone is not None:
+        return timezone
+
+    from django.conf import settings
+    return pytz.timezone(settings.TIME_ZONE)

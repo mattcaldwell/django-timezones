@@ -7,7 +7,7 @@ import pytz
 
 from timezones import forms, zones
 from timezones.utils import coerce_timezone_value, validate_timezone_max_length
-
+from utils import get_timezone
 
 
 MAX_TIMEZONE_LENGTH = getattr(settings, "MAX_TIMEZONE_LENGTH", 100)
@@ -109,12 +109,14 @@ class LocalizedDateTimeField(models.DateTimeField):
 
 def prep_localized_datetime(sender, **kwargs):
     for field in sender._meta.fields:
-        if not isinstance(field, LocalizedDateTimeField) or field.timezone is None:
+        if not isinstance(field, LocalizedDateTimeField):
             continue
         dt_field_name = "_datetimezone_%s" % field.attname
         def get_dtz_field(instance):
             return getattr(instance, dt_field_name)
         def set_dtz_field(instance, dt):
+            if field.timezone is None:
+                field.timezone = get_timezone()
             if dt.tzinfo is None:
                 dt = default_tz.localize(dt)
             time_zone = field.timezone
