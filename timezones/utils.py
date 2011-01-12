@@ -45,12 +45,12 @@ def validate_timezone_max_length(max_length, zones):
 
 
 def activate_timezone(timezone):
-        if isinstance(timezone, basestring):
-            timezone = smart_str(timezone)
-        if timezone in pytz.all_timezones_set:
-            timezone = pytz.timezone(timezone)
-            
-        _timezone[currentThread()] = timezone
+    if isinstance(timezone, basestring):
+        timezone = smart_str(timezone)
+    if timezone in pytz.all_timezones_set:
+        timezone = pytz.timezone(timezone)
+        
+    _timezone[currentThread()] = timezone
 
 def deactivate_timezone():
     global _active
@@ -66,3 +66,4 @@ def get_timezone():
 
     from django.conf import settings
     return pytz.timezone(settings.TIME_ZONE)
+
