@@ -3,6 +3,7 @@ from django.core.exceptions import ValidationError
 from django.utils.encoding import smart_str
 from django.utils.thread_support import currentThread
 import pytz
+from datetime import datetime as dtime
 
 
 default_tz = pytz.timezone(getattr(settings, "TIME_ZONE", "UTC"))
@@ -71,4 +72,21 @@ def get_timezone():
 
     from django.conf import settings
     return pytz.timezone(settings.TIME_ZONE)
+
+
+class datetime(dtime):
+
+    @classmethod
+    def now(cls, tzinfo=None):
+        dt = dtime.now(tzinfo)
+        tzone = get_timezone()
+
+        if dt.tzinfo is None:
+            dt = default_tz.localize(dt)
+
+        dt = dt.astimezone(tzone)
+        return dt
+
+
+
 

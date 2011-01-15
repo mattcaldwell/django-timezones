@@ -1,7 +1,7 @@
 from utils import activate_timezone
 
 class UserTimezoneMiddleware(object):
-    """Set the language as the user language"""
+    """Set the timezone as the user timezone"""
 
     def process_view(self, request, view_func, view_args, view_kwargs):
 
