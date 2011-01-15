@@ -68,8 +68,8 @@ def init_localized_datetime(instance, **kwargs):
                     tzone = pytz.timezone(tzone)                
 
             if dt.tzinfo is None:
-                dt = tzone.localize(dt)
-            else:
-                dt = dt.astimezone(tzone)
+                dt = default_tz.localize(dt)
+
+            dt = dt.astimezone(tzone)
             setattr(instance, attname, dt)
 

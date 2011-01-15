@@ -4,6 +4,9 @@ from django.utils.encoding import smart_str
 from django.utils.thread_support import currentThread
 import pytz
 
+
+default_tz = pytz.timezone(getattr(settings, "TIME_ZONE", "UTC"))
+
 #Dict to manage thread unique timezone
 _timezone = {}
 
@@ -63,6 +66,8 @@ def get_timezone():
 
     if timezone is not None:
         return timezone
+    else:
+        return default_tz
 
     from django.conf import settings
     return pytz.timezone(settings.TIME_ZONE)

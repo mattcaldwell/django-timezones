@@ -1,4 +1,3 @@
-from fields import LocalizedDateTimeField
 from utils import activate_timezone
 
 class UserTimezoneMiddleware(object):

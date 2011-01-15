@@ -85,23 +85,26 @@ class LocalizedDateTimeField(models.DateTimeField):
         """
         Returns field's value prepared for saving into a database.
         """
-        ## convert to settings.TIME_ZONE
+
         if value is not None:
-            if value.tzinfo is None:
-                value = default_tz.localize(value)
-            else:
+            if value.tzinfo is not None:
+                ## convert to settings.TIME_ZONE
                 value = value.astimezone(default_tz)
+                
+            value = value.replace(tzinfo=None)
         return super(LocalizedDateTimeField, self).get_db_prep_save(value, connection=connection)
     
     def get_db_prep_lookup(self, lookup_type, value, connection=None, prepared=None):
         """
         Returns field's value prepared for database lookup.
         """
-        ## convert to settings.TIME_ZONE
+
         if value.tzinfo is None:
-            value = default_tz.localize(value)
-        else:
+            ## convert to settings.TIME_ZONE
             value = value.astimezone(default_tz)
+            
+        value = value.replace(tzinfo=None)
+
         return super(LocalizedDateTimeField, self).get_db_prep_lookup(lookup_type, value, connection=connection, prepared=prepared)
 
 ## RED_FLAG: need to add a check at manage.py validation time that
