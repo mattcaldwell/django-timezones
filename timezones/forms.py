@@ -1,10 +1,13 @@
 from django import forms
 from django.conf import settings
+from django.utils.encoding import smart_str
 
 import pytz
 
 from timezones import zones
-from timezones.utils import adjust_datetime_to_timezone, coerce_timezone_value
+from timezones.utils import adjust_datetime_to_timezone, coerce_timezone_value, get_timezone
+
+default_tz = pytz.timezone(getattr(settings, "TIME_ZONE", "UTC"))
 
 
 
@@ -22,10 +25,13 @@ class LocalizedDateTimeField(forms.DateTimeField):
     """
     def __init__(self, timezone=None, *args, **kwargs):
         super(LocalizedDateTimeField, self).__init__(*args, **kwargs)
-        self.timezone = timezone or settings.TIME_ZONE
-        
+        self.timezone = timezone or get_timezone()
+
     def clean(self, value):
         value = super(LocalizedDateTimeField, self).clean(value)
         if value is None: # field was likely not required
             return None
-        return adjust_datetime_to_timezone(value, from_tz=self.timezone)
+        if not hasattr(self.timezone, 'localize'):
+            self.timezone = pytz.timezone(smart_str(get_timezone()))
+        value = self.timezone.localize(value)
+        return value

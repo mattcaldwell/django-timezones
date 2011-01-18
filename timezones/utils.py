@@ -74,6 +74,16 @@ def get_timezone():
     return pytz.timezone(settings.TIME_ZONE)
 
 
+def set_timezone(dt, tz):
+    if dt.tzinfo is not None:
+        dt = dt.replace(tzinfo=None)
+
+    if not hasattr(tz, 'localize') and isinstance(tz, str):
+        tz = pytz.timezone(tz)
+
+    return tz.localize(dt)
+
+
 class datetime(dtime):
 
     @classmethod
