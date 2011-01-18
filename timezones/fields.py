@@ -99,7 +99,7 @@ class LocalizedDateTimeField(models.DateTimeField):
         Returns field's value prepared for database lookup.
         """
 
-        if value.tzinfo is None:
+        if value.tzinfo is not None:
             ## convert to settings.TIME_ZONE
             value = value.astimezone(default_tz)
             
