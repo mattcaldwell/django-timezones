@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.utils.encoding import smart_str
-from django.utils.thread_support import currentThread
+from threading import local
 import pytz
 from datetime import datetime as dtime
 
@@ -9,7 +9,7 @@ from datetime import datetime as dtime
 default_tz = pytz.timezone(getattr(settings, "TIME_ZONE", "UTC"))
 
 #Dict to manage thread unique timezone
-_timezone = {}
+_timezone = local()
 
 
 def localtime_for_timezone(value, timezone):
@@ -54,16 +54,15 @@ def activate_timezone(timezone):
     if timezone in pytz.all_timezones_set:
         timezone = pytz.timezone(timezone)
         
-    _timezone[currentThread()] = timezone
+    _timezone.value = timezone
 
 def deactivate_timezone():
-    global _active
-    if currentThread() in _timezone:
-        del _timezone[currentThread()]
+    if hasattr(_timezone, 'value'):
+        del _timezone.value
 
 
 def get_timezone():
-    timezone = _timezone.get(currentThread(), None)
+    timezone = getattr(_timezone, 'value', None)
 
     if timezone is not None:
         return timezone
