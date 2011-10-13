@@ -115,5 +115,5 @@ signals.class_prepared.connect(tzone_signals.prep_localized_datetime)
 signals.post_init.connect(tzone_signals.init_localized_datetime)
 
 #South migration support
-from south.modelsinspector import add_introspection_rules
-add_introspection_rules([], ["^timezones\.fields\.LocalizedDateTimeField"])
+#from south.modelsinspector import add_introspection_rules
+#add_introspection_rules([], ["^timezones\.fields\.LocalizedDateTimeField"])
