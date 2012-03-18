@@ -2,7 +2,7 @@ from django.conf import settings
 from django.db import models
 from django.utils.encoding import smart_unicode, smart_str
 from django.db.models import signals
-import pytz
+import pytz, types
 from timezones import forms, zones
 from timezones.utils import coerce_timezone_value, validate_timezone_max_length
 
@@ -94,16 +94,24 @@ class LocalizedDateTimeField(models.DateTimeField):
             value = value.replace(tzinfo=None)
         return super(LocalizedDateTimeField, self).get_db_prep_save(value, connection=connection)
     
+    def _add_tz(self, value):
+        if value.tzinfo is not None:
+            ## convert to settings.TIME_ZONE
+            value = value.astimezone(default_tz)
+        value = value.replace(tzinfo=None)
+        return value
+
     def get_db_prep_lookup(self, lookup_type, value, connection=None, prepared=None):
         """
         Returns field's value prepared for database lookup.
         """
+        print value
 
-        if value.tzinfo is not None:
-            ## convert to settings.TIME_ZONE
-            value = value.astimezone(default_tz)
-            
-        value = value.replace(tzinfo=None)
+        if isinstance(value, types.ListType):
+            for i, val in enumerate(value):
+                value[i] = self._add_tz(val)
+        else:
+            value = self._add_tz(value)
 
         return super(LocalizedDateTimeField, self).get_db_prep_lookup(lookup_type, value, connection=connection, prepared=prepared)
 
