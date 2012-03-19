@@ -94,7 +94,8 @@ class LocalizedDateTimeField(models.DateTimeField):
             value = value.replace(tzinfo=None)
         return super(LocalizedDateTimeField, self).get_db_prep_save(value, connection=connection)
     
-    def _add_tz(self, value):
+    @classmethod
+    def _add_tz(cls, value):
         if value.tzinfo is not None:
             ## convert to settings.TIME_ZONE
             value = value.astimezone(default_tz)
@@ -105,8 +106,6 @@ class LocalizedDateTimeField(models.DateTimeField):
         """
         Returns field's value prepared for database lookup.
         """
-        print value
-
         if isinstance(value, types.ListType):
             for i, val in enumerate(value):
                 value[i] = self._add_tz(val)
