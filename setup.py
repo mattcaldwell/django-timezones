@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name = "django-timezones",
-    version = __import__("timezones").__version__,
+    version = '%s-mc1' % __import__("timezones").__version__,
     author = "Brian Rosner",
     author_email = "brosner@gmail.com",
     description = "A Django reusable app to deal with timezone localization for users",
